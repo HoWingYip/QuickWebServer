@@ -1,3 +1,5 @@
+# QuickWebServer #
+
 An electron app that just lets you serve static files from as many directories on your PC as you wish.
 
 Many more features are planned for future releases such as
