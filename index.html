@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Web Server Manager</title>
+    <link href="index.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div id="ServerList">
+      <div id="ServerList_Header">Server List</div>
+      <div id="ServerList_List">No web servers started yet.</div>
+    </div>
+    
+    <div id="ServerLog">
+      <div id="ServerLog_Header">Status / Logs</div>
+      <div id="ServerLog_List"><pre id="ServerLog_Log">App started.
+
+The Simple Web Server Manager allows you to quickly serve static files from any directory it can access on your PC.
+
+It will serve the files to a random port on localhost (e.g. localhost:3000).
+
+Simply key in the directory and hit "Start Serving Files".</pre></div>
+    </div>
+
+    <div id="NewServer">
+      <div id="NewServer_Header">Start New Server</div>
+      <div id="NewServer_Content">
+        Server Root:
+        <input id="NewServer_ServerRoot" placeholder="C:\Websites" />
+        <button onclick="NewServer();" id="NewServer_Action" title="Servers files from the above location, from a random port on localhost.">Start Serving Files</button>
+      </div>
+    </div>
+
+    <!-- Scripts that do shit -->
+    <script>
+      const express = require('express')
+      let apps = [];
+      let port = 3000;
+      let appsServers = [];
+
+      function NewServer() {
+        if (port == 3000) {
+          document.getElementById("ServerList_List").innerHTML = "";
+        }
+
+        if (document.getElementById("NewServer_ServerRoot").value == "") {
+          document.getElementById("ServerLog_Log").innerText += "\n\nSERVER PATH MUST NOT BE EMPTY!!! :D"
+        }
+
+        // Start the server
+        apps.push(express());
+        apps[apps.length - 1].use(express.static(document.getElementById("NewServer_ServerRoot").value))
+        appsServers.push(apps[apps.length - 1].listen(port, () => {
+          // Update UI - Log
+          document.getElementById("ServerLog_Log").innerText += "\n\nNEW SERVER STARTED.\nAt port " + port + " from directory " + document.getElementById("NewServer_ServerRoot").value;
+
+          // Update UI - Server List
+          document.getElementById("ServerList_List").innerHTML += `<div class="ServerList_Server" id="ServerList_List_${apps.length - 1}">
+            <b>localhost:${port}</b>
+            <br><span>${document.getElementById("NewServer_ServerRoot").value}</span>
+            <br><button onclick="CloseServer(${apps.length - 1});">Close Server</button>
+          </div>`;
+          
+          // Increment port number
+          port++;
+
+          // Clear directory thing
+          document.getElementById("NewServer_ServerRoot").value = "";
+        }));
+      }
+
+      function CloseServer(id) {
+        appsServers[id].close();
+        document.getElementById("ServerList_List").removeChild(document.getElementById("ServerList_List_" + id));
+        document.getElementById("ServerLog_Log").innerText += "\n\nSERVER CLOSED.";
+      }
+    </script>
+  </body>
+</html>

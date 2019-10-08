@@ -1,0 +1,78 @@
+body {
+  background-color: black; color: white;
+  box-sizing: border-box;
+  font-family: "Bahnscrift", sans-serif;
+  margin: 0;
+  cursor: default;
+}
+
+#ServerList, #ServerLog {
+  display: inline-block;
+  width: calc(50vw - 1px);
+}
+
+#ServerLog {
+  position: fixed; right: 0; top: 0;
+}
+
+#ServerLog_Log {
+  white-space: pre-wrap;
+}
+
+.ServerList_Server {
+  background-color: #333333; color: white;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.ServerList_Server > span {
+  font-family: "Bahnschrift Condensed", sans-serif;
+  font-size: .95rem;
+}
+
+#ServerList_Header, #ServerLog_Header, #NewServer_Header {
+  background-color: #333333; color: lightgrey;
+  text-transform: uppercase;
+  padding: 15px; padding-top: 7px; padding-bottom: 7px;
+  font-family: "Bahnschrift Condensed", sans-serif;
+}
+
+#ServerList_List, #ServerLog_List {
+  padding: 15px;
+  height: calc(100vh - 250px); overflow-y: scroll;
+}
+
+#ServerLog_List > pre {
+  font-family: "Consolas", monospace;
+  font-size: .95rem;
+}
+
+#NewServer_Content {
+  padding: 15px;
+}
+
+#NewServer_ServerRoot {
+  padding: 10px;
+  background-color: #333333; color: lightgrey;
+  border: 0; outline: 0;
+  width: calc(100vw - 50px);
+  font-family: "Bahnschrift", sans-serif;
+  margin-top: 10px;
+  display: block;
+}
+
+button {
+  margin-top: 10px;
+  background-color: grey; color: white;
+  font-family: "Bahnschrift Condensed", sans-serif;
+  border: 0; outline: 0;
+  padding: 5px;
+  cursor: pointer;
+  transition: .1s;
+  text-transform: uppercase;
+}
+
+button:hover {
+  background-color: lightgrey; color: black;
+}
