@@ -50,6 +50,7 @@ body {
 
 #NewServer_Content {
   padding: 15px;
+  display: block;
 }
 
 #NewServer_ServerRoot {
@@ -62,6 +63,11 @@ body {
   display: block;
 }
 
+.Font_Condensed {
+  font-family: "Bahnschrift Condensed", sans-serif;
+  text-transform: uppercase;
+}
+
 button {
   margin-top: 10px;
   background-color: grey; color: white;
@@ -71,6 +77,19 @@ button {
   cursor: pointer;
   transition: .1s;
   text-transform: uppercase;
+  border-radius: 5px;
+}
+
+.ServerList_Recent {
+  margin-top: 2.5px;
+  padding: 2.5px;
+  border-radius: 0;
+  font-size: .9rem;
+  background-color: transparent;
+  text-transform: none;
+  display: block;
+  width: 100%;
+  text-align: left;
 }
 
 button:hover {

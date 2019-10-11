@@ -8,7 +8,7 @@
   <body>
     <div id="ServerList">
       <div id="ServerList_Header">Server List</div>
-      <div id="ServerList_List">No web servers started yet.</div>
+      <div id="ServerList_List"></div>
     </div>
     
     <div id="ServerLog">
@@ -24,48 +24,118 @@ Simply key in the directory and hit "Start Serving Files".</pre></div>
 
     <div id="NewServer">
       <div id="NewServer_Header">Start New Server</div>
-      <div id="NewServer_Content">
+      <form id="NewServer_Content" onsubmit="event.preventDefault(); NewServer();">
         Server Root:
         <input id="NewServer_ServerRoot" placeholder="C:\Websites" />
-        <button onclick="NewServer();" id="NewServer_Action" title="Servers files from the above location, from a random port on localhost.">Start Serving Files</button>
-      </div>
+        <button type="submit" id="NewServer_Action" title="Servers files from the above location, from a random port on localhost.">Start Serving Files</button>
+      </form>
     </div>
 
     <!-- Scripts that do shit -->
     <script>
-      const express = require('express')
+      const express = require('express');
+      const fs = require("fs");
       let apps = [];
       let port = 3000;
       let appsServers = [];
+      let activeServers = 0;
 
-      function NewServer() {
+      InitServerList();
+
+      // initialise 'recents'
+      if (!localStorage.getItem("recents")) localStorage.setItem("recents", JSON.stringify([]));
+
+      function InitServerList() {
+        document.getElementById("ServerList_List").innerHTML = `No web servers started yet.<br><br>
+        <b class="Font_Condensed">Recent Servers:</b>
+        <div id="ServerList_Recents"></div>`;
+
+        // display recents
+        if (!localStorage.getItem("recents")) localStorage.setItem("recents", JSON.stringify([]));
+        else {
+          let recents = JSON.parse(localStorage.getItem("recents"));
+          for (i = (recents.length - 1); 0 <= i; i--) {
+            document.getElementById("ServerList_Recents").innerHTML += `<button title="Start a server from this directory" onclick="StartRecent(${i});" class="ServerList_Recent">${atob(recents[i])}</button>`;
+          }
+        }
+      }
+
+      function StartRecent(index) {
         if (port == 3000) {
           document.getElementById("ServerList_List").innerHTML = "";
         }
 
-        if (document.getElementById("NewServer_ServerRoot").value == "") {
-          document.getElementById("ServerLog_Log").innerText += "\n\nSERVER PATH MUST NOT BE EMPTY!!! :D"
+        // Get recent path from localStorage
+        let recents = JSON.parse(localStorage.getItem('recents'));
+        let path = atob(recents[index]);
+
+        // Check if specified path exists
+        if (!fs.existsSync(path)) {
+          document.getElementById("ServerLog_Log").innerText += "\n\n=====\nTHE SPECIFIED PATH DOES NOT EXIST.";
+          return;
         }
 
         // Start the server
         apps.push(express());
-        apps[apps.length - 1].use(express.static(document.getElementById("NewServer_ServerRoot").value))
+        apps[apps.length - 1].use(express.static(path))
         appsServers.push(apps[apps.length - 1].listen(port, () => {
           // Update UI - Log
-          document.getElementById("ServerLog_Log").innerText += "\n\nNEW SERVER STARTED.\nAt port " + port + " from directory " + document.getElementById("NewServer_ServerRoot").value;
+          document.getElementById("ServerLog_Log").innerText += "\n\nNEW SERVER STARTED.\nAt port " + port + " from directory " + path;
 
           // Update UI - Server List
+          if (activeServers == 0) document.getElementById("ServerList_List").innerHTML = "";
           document.getElementById("ServerList_List").innerHTML += `<div class="ServerList_Server" id="ServerList_List_${apps.length - 1}">
             <b>localhost:${port}</b>
-            <br><span>${document.getElementById("NewServer_ServerRoot").value}</span>
+            <br><span>${path}</span>
+            <br><button onclick="CloseServer(${apps.length - 1});">Close Server</button>
+          </div>`;
+
+          // Increment port number
+          port++;
+          activeServers++;
+        }));
+      }
+
+      function NewServer() {
+        let path = document.getElementById("NewServer_ServerRoot").value.trim();
+
+        if (path == "") {
+          document.getElementById("ServerLog_Log").innerText += "\n\n=====\nSERVER PATH MUST NOT BE EMPTY!!! :D";
+          return;
+        }
+
+        // Check if specified path exists
+        if (!fs.existsSync(path)) {
+          document.getElementById("ServerLog_Log").innerText += "\n\n=====\nTHE SPECIFIED PATH DOES NOT EXIST.";
+          return;
+        }
+
+        // Start the server
+        apps.push(express());
+        apps[apps.length - 1].use(express.static(path))
+        appsServers.push(apps[apps.length - 1].listen(port, () => {
+          // Update UI - Log
+          document.getElementById("ServerLog_Log").innerText += "\n\nNEW SERVER STARTED.\nAt port " + port + " from directory " + path;
+
+          // Update UI - Server List
+          if (activeServers == 0) document.getElementById("ServerList_List").innerHTML = "";
+          document.getElementById("ServerList_List").innerHTML += `<div class="ServerList_Server" id="ServerList_List_${apps.length - 1}">
+            <b>localhost:${port}</b>
+            <br><span>${path}</span>
             <br><button onclick="CloseServer(${apps.length - 1});">Close Server</button>
           </div>`;
           
           // Increment port number
-          port++;
+          port++; activeServers++;
 
           // Clear directory thing
           document.getElementById("NewServer_ServerRoot").value = "";
+
+          // Save to 'recents'
+          let recents = JSON.parse(localStorage.getItem('recents'));
+          if (!recents.includes(btoa(path))) recents.push(btoa(path));
+          if (recents.length > 10) recents.shift();
+          localStorage.setItem("recents", JSON.stringify(recents));
         }));
       }
 
@@ -73,6 +143,8 @@ Simply key in the directory and hit "Start Serving Files".</pre></div>
         appsServers[id].close();
         document.getElementById("ServerList_List").removeChild(document.getElementById("ServerList_List_" + id));
         document.getElementById("ServerLog_Log").innerText += "\n\nSERVER CLOSED.";
+        activeServers--;
+        if (activeServers == 0) InitServerList();
       }
     </script>
   </body>
