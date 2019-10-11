@@ -9,5 +9,6 @@ Many more features are planned for future releases such as
 - UI overhaul
 - actually reducing the app size!
 - ***WRITING AN EQUIVALENT APP IN C# SO I DON'T DISTRIBUTE A 100 MB ZIP FILE...***
+- possibly, PHP support?
 
 ![image](https://user-images.githubusercontent.com/22087932/66402073-c6fa8e00-ea16-11e9-8532-f345beec0a3d.png)
